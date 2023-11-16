@@ -1,0 +1,10 @@
+list_2D = [(3, 5, 2), (1, 2, 0), (3, 1, 1), (0, 0, 2), (4, 2, 3)]
+
+row_sums = [sum(row) for row in list_2D]
+print("Sums of each row:", row_sums)
+
+total_sum = sum(sum(row) for row in list_2D)
+print("Total sum:", total_sum)
+
+col_sums = [sum(row[i] for row in list_2D) for i in range(len(list_2D[0]))]
+print("Sums of each column:", col_sums)
