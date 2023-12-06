@@ -1,15 +1,56 @@
-my_text = 'In a competitive research environment, publishing is not enough anymore. You have to make your research accessible, findable and visible. Your online identity is the central key for your career and your recognition, particularly for young researchers. This session will help you to build your online research profile by applying best practices. You will learn how to evaluate your online identity and promote your work by using the tools best suited to your needs. A special focus on ORCID will be presented.'
+import re
+from collections import Counter
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 
-special_symbols = ",.'"
-for symbol in special_symbols:
-    my_text = my_text.replace(symbol, '')
-print (my_text)
+def read_text_file(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        return file.read()
 
-word_list = my_text.lower().split()
-word_count = {}
-for word in word_list:
-    if word in word_count:
-        word_count[word] += 1
-    else:
-        word_count[word] = 1
-print(word_count)
+def extract_words(text):
+    words = re.findall(r'\b[A-Z][a-zA-Z]{3,}\b', text)
+    return words
+
+def plot_bar_chart(word_counts):
+    if not word_counts:
+        print("No words found.")
+        return
+
+    words, counts = zip(*word_counts)
+    plt.bar(words, counts, color='blue')
+    plt.xlabel('Words')
+    plt.ylabel('Occurrences')
+    plt.title('Top 10 Most Common Words')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.savefig('bar_chart.png')
+
+def generate_word_cloud(words):
+    wordcloud = WordCloud(width=800, height=400, background_color='white')
+    wordcloud.generate(' '.join(words))
+    wordcloud.to_file('wordcloud.png')
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    plt.show()
+
+def main():
+    file_path = '/Users/mainprofile/Downloads/homework.txt'
+    text = read_text_file(file_path)
+    words = extract_words(text)
+
+    if not words:
+        print("Extracted words:", words)
+        print("No words found.")
+        return
+
+    word_counts = Counter(words).most_common(10)
+
+    print("List of words and their occurrences:")
+    for word, count in word_counts:
+        print(f"{word}: {count}")
+
+    plot_bar_chart(word_counts)
+    generate_word_cloud(words)
+
+if __name__ == "__main__":
+    main()
