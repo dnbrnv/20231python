@@ -1,0 +1,37 @@
+import os
+from urllib.request import urlopen
+
+# URL to download the CSV file
+url = 'https://query1.finance.yahoo.com/v7/finance/download/BIDU?period1=1673016238&period2=1704552238&interval=1d&events=history&includeAdjustedClose=true'
+
+# Local path to save the downloaded file
+local_path = 'BIDU.csv'
+
+# Download the file
+with urlopen(url) as response, open(local_path, 'wb') as file:
+    file.write(response.read())
+
+# Your data processing code starts here
+import csv
+
+# Read data from the downloaded CSV file
+with open(local_path, 'r') as csvfile:
+    csv_reader = csv.DictReader(csvfile)
+    data = list(csv_reader)
+
+# Calculate the percentage change between Close and Open and add it as a new column
+for row in data:
+    close_price = float(row['Close'])
+    open_price = float(row['Open'])
+    percentage_change = ((close_price - open_price) / open_price) * 100
+    row['Percentage Change'] = percentage_change
+
+# Save the updated data back to the CSV file
+with open(local_path, 'w', newline='') as csvfile:
+    fieldnames = csv_reader.fieldnames + ['Percentage Change']
+    csv_writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    
+    csv_writer.writeheader()
+    csv_writer.writerows(data)
+
+print("Percentage change between Close and Open added to the CSV file.")
